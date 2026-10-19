@@ -11,11 +11,13 @@ import AVFoundation
 /// by observing `outputVolume` and resetting it after each press.
 final class VolumeButtonHandler: ObservableObject {
     private static let step: Float = 1 / 16
+    private static let resetSettleTime: TimeInterval = 0.15
 
     private var observation: NSKeyValueObservation?
     private var volumeView: MPVolumeView?
     private var originalVolume: Float?
     private var baseVolume: Float = 0.5
+    private var ignoresChangesUntil = Date.distantPast
     private var onPress: ((Int) -> Void)?
 
     deinit {
@@ -80,10 +82,25 @@ final class VolumeButtonHandler: ObservableObject {
     }
 
     private func handleVolumeChange(_ newValue: Float) {
-        // Changes caused by our own reset land back on the base volume.
-        guard abs(newValue - baseVolume) > 0.001 else { return }
+        // Our own reset can land slightly off the base volume; don't count it as a press.
+        guard Date() >= ignoresChangesUntil,
+              abs(newValue - baseVolume) > 0.001
+        else { return }
         onPress?(newValue < baseVolume ? 1 : -1)
+        resetVolume()
+    }
+
+    private func resetVolume() {
+        ignoresChangesUntil = Date().addingTimeInterval(Self.resetSettleTime)
         setVolume(baseVolume)
+        // Compare later presses against where the volume actually settled.
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.resetSettleTime) { [weak self] in
+            guard let self, observation != nil else { return }
+            let actual = AVAudioSession.sharedInstance().outputVolume
+            if actual >= Self.step / 2, actual <= 1 - Self.step / 2 {
+                baseVolume = actual
+            }
+        }
     }
 
     private func setVolume(_ value: Float) {
