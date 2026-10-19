@@ -10,13 +10,13 @@ import AVFoundation
 /// Turns hardware volume button presses into page offsets (+1 for down, -1 for up)
 /// by observing `outputVolume` and resetting it after each press.
 final class VolumeButtonHandler: ObservableObject {
-    private static let step: Float = 1 / 16
+    // Mid-scale is a valid step at any volume granularity and farthest from both ends.
+    private static let baseVolume: Float = 0.5
     private static let resetSettleTime: TimeInterval = 0.15
 
     private var observation: NSKeyValueObservation?
     private var volumeView: MPVolumeView?
     private var originalVolume: Float?
-    private var baseVolume: Float = 0.5
     private var ignoresChangesUntil = Date.distantPast
     private var onPress: ((Int) -> Void)?
 
@@ -45,14 +45,10 @@ final class VolumeButtonHandler: ObservableObject {
         (DeviceUtil.keyWindow ?? DeviceUtil.anyWindow)?.addSubview(view)
         volumeView = view
 
-        // Keep away from 0 and 1 so presses in both directions still change the volume.
-        let current = session.outputVolume
-        originalVolume = current
-        baseVolume = min(max(current, Self.step), 1 - Self.step)
-        if baseVolume != current {
+        originalVolume = session.outputVolume
+        if originalVolume != Self.baseVolume {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-                guard let self else { return }
-                setVolume(baseVolume)
+                self?.resetVolume()
             }
         }
 
@@ -68,7 +64,7 @@ final class VolumeButtonHandler: ObservableObject {
         observation?.invalidate()
         observation = nil
         onPress = nil
-        if let originalVolume, originalVolume != baseVolume {
+        if let originalVolume, originalVolume != Self.baseVolume {
             setVolume(originalVolume)
         }
         originalVolume = nil
@@ -84,24 +80,22 @@ final class VolumeButtonHandler: ObservableObject {
     private func handleVolumeChange(_ newValue: Float) {
         // Our own reset can land slightly off the base volume; don't count it as a press.
         guard Date() >= ignoresChangesUntil,
-              abs(newValue - baseVolume) > 0.001
+              abs(newValue - Self.baseVolume) > 0.001
         else { return }
-        Logger.info("press", context: ["volume": newValue, "base": baseVolume])
-        onPress?(newValue < baseVolume ? 1 : -1)
+        Logger.info("press", context: ["volume": newValue])
+        onPress?(newValue < Self.baseVolume ? 1 : -1)
         resetVolume()
     }
 
     private func resetVolume(attempt: Int = 0) {
         ignoresChangesUntil = Date().addingTimeInterval(Self.resetSettleTime)
-        setVolume(baseVolume)
+        setVolume(Self.baseVolume)
         // Retry if the reset didn't take, otherwise the volume drifts to 0 or 1 and presses stop registering.
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.resetSettleTime) { [weak self] in
             guard let self, observation != nil else { return }
             let actual = AVAudioSession.sharedInstance().outputVolume
-            if abs(actual - baseVolume) < Self.step / 2 {
-                baseVolume = actual
-            } else if attempt < 2 {
-                Logger.info("reset retry", context: ["volume": actual, "base": baseVolume])
+            if abs(actual - Self.baseVolume) > 0.02, attempt < 3 {
+                Logger.info("reset retry", context: ["volume": actual])
                 resetVolume(attempt: attempt + 1)
             }
         }
