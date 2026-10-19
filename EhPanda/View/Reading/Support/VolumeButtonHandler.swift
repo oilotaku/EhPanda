@@ -86,25 +86,33 @@ final class VolumeButtonHandler: ObservableObject {
         guard Date() >= ignoresChangesUntil,
               abs(newValue - baseVolume) > 0.001
         else { return }
+        Logger.info("press", context: ["volume": newValue, "base": baseVolume])
         onPress?(newValue < baseVolume ? 1 : -1)
         resetVolume()
     }
 
-    private func resetVolume() {
+    private func resetVolume(attempt: Int = 0) {
         ignoresChangesUntil = Date().addingTimeInterval(Self.resetSettleTime)
         setVolume(baseVolume)
-        // Compare later presses against where the volume actually settled.
+        // Retry if the reset didn't take, otherwise the volume drifts to 0 or 1 and presses stop registering.
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.resetSettleTime) { [weak self] in
             guard let self, observation != nil else { return }
             let actual = AVAudioSession.sharedInstance().outputVolume
-            if actual >= Self.step / 2, actual <= 1 - Self.step / 2 {
+            if abs(actual - baseVolume) < Self.step / 2 {
                 baseVolume = actual
+            } else if attempt < 2 {
+                Logger.info("reset retry", context: ["volume": actual, "base": baseVolume])
+                resetVolume(attempt: attempt + 1)
             }
         }
     }
 
     private func setVolume(_ value: Float) {
         guard let slider = volumeView?.subviews.compactMap({ $0 as? UISlider }).first else { return }
+        // The hidden slider doesn't track hardware presses; setting its stale value again is a no-op.
+        if abs(slider.value - value) < 0.001 {
+            slider.setValue(value > 0.5 ? value - 0.01 : value + 0.01, animated: false)
+        }
         slider.setValue(value, animated: false)
         slider.sendActions(for: .valueChanged)
     }
