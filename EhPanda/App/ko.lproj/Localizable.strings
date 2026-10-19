@@ -238,6 +238,7 @@
 "reading_setting_view.title.direction" = "방향";
 "reading_setting_view.title.preload_limit" = "페이지 미리 로딩";
 "reading_setting_view.title.enables_landscape" = "Enables landscape";
+"reading_setting_view.title.enables_volume_key_paging" = "Volume key paging";
 "reading_setting_view.title.separator_height" = "페이지 간 여백 두께";
 "reading_setting_view.title.maximum_scale_factor" = "최대 확대 비율";
 "reading_setting_view.title.double_tap_scale_factor" = "더블 탭 확대 비율";

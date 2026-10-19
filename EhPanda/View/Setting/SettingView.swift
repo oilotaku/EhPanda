@@ -83,6 +83,7 @@ private extension SettingView {
                 readingDirection: $store.setting.readingDirection,
                 prefetchLimit: $store.setting.prefetchLimit,
                 enablesLandscape: $store.setting.enablesLandscape,
+                enablesVolumeKeyPaging: $store.setting.enablesVolumeKeyPaging,
                 contentDividerHeight: $store.setting.contentDividerHeight,
                 maximumScaleFactor: $store.setting.maximumScaleFactor,
                 doubleTapScaleFactor: $store.setting.doubleTapScaleFactor

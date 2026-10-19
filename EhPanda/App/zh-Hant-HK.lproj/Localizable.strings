@@ -238,6 +238,7 @@
 "reading_setting_view.title.direction" = "翻頁方向";
 "reading_setting_view.title.preload_limit" = "預先載入頁數";
 "reading_setting_view.title.enables_landscape" = "啟用橫向顯示";
+"reading_setting_view.title.enables_volume_key_paging" = "音量鍵翻頁";
 "reading_setting_view.title.separator_height" = "頁間分隔高度";
 "reading_setting_view.title.maximum_scale_factor" = "縮放上限";
 "reading_setting_view.title.double_tap_scale_factor" = "雙擊縮放值";

@@ -2010,6 +2010,8 @@ internal enum L10n {
         internal static let doubleTapScaleFactor = L10n.tr("Localizable", "reading_setting_view.title.double_tap_scale_factor", fallback: "Double tap scale factor")
         /// Enables landscape
         internal static let enablesLandscape = L10n.tr("Localizable", "reading_setting_view.title.enables_landscape", fallback: "Enables landscape")
+        /// Volume key paging
+        internal static let enablesVolumeKeyPaging = L10n.tr("Localizable", "reading_setting_view.title.enables_volume_key_paging", fallback: "Volume key paging")
         /// Maximum scale factor
         internal static let maximumScaleFactor = L10n.tr("Localizable", "reading_setting_view.title.maximum_scale_factor", fallback: "Maximum scale factor")
         /// Preload limit

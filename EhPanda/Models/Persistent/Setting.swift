@@ -43,6 +43,7 @@ struct Setting: Codable, Equatable {
     var readingDirection: ReadingDirection = .vertical
     var prefetchLimit = 10
     var enablesLandscape = false
+    var enablesVolumeKeyPaging = false
     var enablesDualPageMode = false
     var exceptCover = false
     var contentDividerHeight: Double = 0
@@ -210,6 +211,7 @@ extension Setting {
         readingDirection = (try? container?.decodeIfPresent(ReadingDirection.self, forKey: .readingDirection)) ?? .vertical
         prefetchLimit = (try? container?.decodeIfPresent(Int.self, forKey: .prefetchLimit)) ?? 10
         enablesLandscape = (try? container?.decodeIfPresent(Bool.self, forKey: .enablesLandscape)) ?? false
+        enablesVolumeKeyPaging = (try? container?.decodeIfPresent(Bool.self, forKey: .enablesVolumeKeyPaging)) ?? false
         enablesDualPageMode = (try? container?.decodeIfPresent(Bool.self, forKey: .enablesDualPageMode)) ?? false
         exceptCover = (try? container?.decodeIfPresent(Bool.self, forKey: .exceptCover)) ?? false
         contentDividerHeight = (try? container?.decodeIfPresent(Double.self, forKey: .contentDividerHeight)) ?? 0

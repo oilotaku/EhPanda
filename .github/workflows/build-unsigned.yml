@@ -1,0 +1,54 @@
+name: Build unsigned IPA
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - volume-page-turn
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.6.app
+  SCHEME_NAME: 'EhPanda'
+  BUILDS_PATH: '/tmp/action-builds'
+  PAYLOAD_PATH: '/tmp/action-builds/Payload'
+  THIN_PAYLOAD_SCRIPT_PATH: './actions-tool/thin-payload.sh'
+  ARCHIVE_PATH: '/tmp/action-builds/EhPanda.xcarchive'
+  IPA_OUTPUT_PATH: '/tmp/action-builds/EhPanda.ipa'
+
+jobs:
+  Build:
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Install iOS 26 Platform
+        uses: nick-fields/retry@v4
+        with:
+          retry_on: error
+          max_attempts: 10
+          timeout_minutes: 999
+          command: xcodebuild -downloadPlatform iOS
+      - name: Xcode archive
+        run: xcodebuild archive
+          -skipMacroValidation
+          -scheme ${{ env.SCHEME_NAME }}
+          -destination 'generic/platform=iOS'
+          -archivePath ${{ env.ARCHIVE_PATH }}
+          CODE_SIGN_IDENTITY=
+          CODE_SIGN_ENTITLEMENTS=
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          GCC_OPTIMIZATION_LEVEL=s
+          SWIFT_OPTIMIZATION_LEVEL=-O
+      - name: Export .ipa file
+        run: |
+          mkdir -p ${{ env.PAYLOAD_PATH }}
+          mv ${{ env.ARCHIVE_PATH }}/Products/Applications/${{ env.SCHEME_NAME }}.app ${{ env.PAYLOAD_PATH }}/${{ env.SCHEME_NAME }}.app
+          sh ${{ env.THIN_PAYLOAD_SCRIPT_PATH }} ${{ env.PAYLOAD_PATH }}/${{ env.SCHEME_NAME }}.app
+          pushd ${{ env.BUILDS_PATH }}
+          zip -r ${{ env.IPA_OUTPUT_PATH }} ./Payload
+          popd
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: EhPanda-unsigned
+          path: ${{ env.IPA_OUTPUT_PATH }}
+          retention-days: 14

@@ -238,6 +238,7 @@
 "reading_setting_view.title.direction" = "Direction";
 "reading_setting_view.title.preload_limit" = "Preload limit";
 "reading_setting_view.title.enables_landscape" = "Enables landscape";
+"reading_setting_view.title.enables_volume_key_paging" = "Volume key paging";
 "reading_setting_view.title.separator_height" = "Höhe der Teilung";
 "reading_setting_view.title.maximum_scale_factor" = "Maximaler Skalierungsfaktor";
 "reading_setting_view.title.double_tap_scale_factor" = "Doppel-Tap Skalierungsfaktor";

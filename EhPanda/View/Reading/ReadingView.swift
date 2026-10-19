@@ -18,6 +18,7 @@ struct ReadingView: View {
 
     @StateObject private var liveTextHandler = LiveTextHandler()
     @StateObject private var autoPlayHandler = AutoPlayHandler()
+    @StateObject private var volumeButtonHandler = VolumeButtonHandler()
     @StateObject private var gestureHandler = GestureHandler()
     @StateObject private var pageHandler = PageHandler()
     @StateObject private var page: Page = .first()
@@ -44,6 +45,7 @@ struct ReadingView: View {
                         readingDirection: $setting.readingDirection,
                         prefetchLimit: $setting.prefetchLimit,
                         enablesLandscape: $setting.enablesLandscape,
+                        enablesVolumeKeyPaging: $setting.enablesVolumeKeyPaging,
                         contentDividerHeight: $setting.contentDividerHeight,
                         maximumScaleFactor: $setting.maximumScaleFactor,
                         doubleTapScaleFactor: $setting.doubleTapScaleFactor
@@ -85,8 +87,12 @@ struct ReadingView: View {
             .onDisappear {
                 liveTextHandler.cancelRequests()
                 setAutoPlayPolocy(.off)
+                volumeButtonHandler.stop()
             }
-            .onAppear { store.send(.onAppear(gid, setting.enablesLandscape)) }
+            .onAppear {
+                store.send(.onAppear(gid, setting.enablesLandscape))
+                setVolumeKeyPaging(setting.enablesVolumeKeyPaging)
+            }
     }
 
     var content: some View {
@@ -203,6 +209,11 @@ struct ReadingView: View {
                 Logger.info("setting.enablesLandscape changed", context: ["newValue": newValue])
                 store.send(.setOrientationPortrait(!newValue))
             }
+
+            // Volume key paging
+            .onChange(of: setting.enablesVolumeKeyPaging) { _, newValue in
+                setVolumeKeyPaging(newValue)
+            }
     }
 
     @ViewBuilder private func imageStack(index: Int) -> some View {
@@ -250,6 +261,19 @@ extension ReadingView {
             page.update(.next)
             Logger.info("Pager.update", context: ["update": "next"])
         })
+    }
+    func setVolumeKeyPaging(_ isEnabled: Bool) {
+        guard isEnabled else {
+            volumeButtonHandler.stop()
+            return
+        }
+        // Volume down goes to the next page, volume up to the previous one.
+        volumeButtonHandler.start { offset in
+            guard gestureHandler.scale == 1 else { return }
+            let newValue = page.index + offset
+            page.update(.new(index: newValue))
+            Logger.info("Pager.update", context: ["update": newValue])
+        }
     }
     func analyzeImageForLiveText(index: Int) {
         Logger.info("analyzeImageForLiveText", context: ["index": index])

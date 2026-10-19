@@ -10,18 +10,21 @@ struct ReadingSettingView: View {
     @Binding private var readingDirection: ReadingDirection
     @Binding private var prefetchLimit: Int
     @Binding private var enablesLandscape: Bool
+    @Binding private var enablesVolumeKeyPaging: Bool
     @Binding private var contentDividerHeight: Double
     @Binding private var maximumScaleFactor: Double
     @Binding private var doubleTapScaleFactor: Double
 
     init(
         readingDirection: Binding<ReadingDirection>, prefetchLimit: Binding<Int>,
-        enablesLandscape: Binding<Bool>, contentDividerHeight: Binding<Double>,
+        enablesLandscape: Binding<Bool>, enablesVolumeKeyPaging: Binding<Bool>,
+        contentDividerHeight: Binding<Double>,
         maximumScaleFactor: Binding<Double>, doubleTapScaleFactor: Binding<Double>
     ) {
         _readingDirection = readingDirection
         _prefetchLimit = prefetchLimit
         _enablesLandscape = enablesLandscape
+        _enablesVolumeKeyPaging = enablesVolumeKeyPaging
         _contentDividerHeight = contentDividerHeight
         _maximumScaleFactor = maximumScaleFactor
         _doubleTapScaleFactor = doubleTapScaleFactor
@@ -45,6 +48,10 @@ struct ReadingSettingView: View {
                 if !DeviceUtil.isPad {
                     Toggle(L10n.Localizable.ReadingSettingView.Title.enablesLandscape, isOn: $enablesLandscape)
                 }
+                Toggle(
+                    L10n.Localizable.ReadingSettingView.Title.enablesVolumeKeyPaging,
+                    isOn: $enablesVolumeKeyPaging
+                )
             }
             Section(L10n.Localizable.ReadingSettingView.Section.Title.appearance) {
                 Picker(
@@ -126,6 +133,7 @@ struct ReadingSettingView_Previews: PreviewProvider {
                 readingDirection: .constant(.vertical),
                 prefetchLimit: .constant(10),
                 enablesLandscape: .constant(false),
+                enablesVolumeKeyPaging: .constant(false),
                 contentDividerHeight: .constant(0),
                 maximumScaleFactor: .constant(3),
                 doubleTapScaleFactor: .constant(2)

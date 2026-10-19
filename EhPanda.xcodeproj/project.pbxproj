@@ -279,6 +279,7 @@
 		EA5AA4A72EA9149E00BC2B5C /* PageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5AA4A62EA9149E00BC2B5C /* PageHandler.swift */; };
 		EA5AA4A82EA9149E00BC2B5C /* LiveTextHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5AA4A52EA9149E00BC2B5C /* LiveTextHandler.swift */; };
 		EA5AA4A92EA9149E00BC2B5C /* GestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5AA4A42EA9149E00BC2B5C /* GestureHandler.swift */; };
+		EA5AA4B12EA9149E00BC2B5C /* VolumeButtonHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5AA4B22EA9149E00BC2B5C /* VolumeButtonHandler.swift */; };
 		EA5AA4AA2EA9149E00BC2B5C /* AutoPlayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5AA4A32EA9149E00BC2B5C /* AutoPlayHandler.swift */; };
 		EA698C032CCDD2FB0058BC19 /* EquatableVoid.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA698C022CCDD2FB0058BC19 /* EquatableVoid.swift */; };
 		EA698C092CCDE7090058BC19 /* IdentifiableBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA698C082CCDE7050058BC19 /* IdentifiableBox.swift */; };
@@ -602,6 +603,7 @@
 		EA0C92582C3EB49500D211F6 /* README.jpn.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.jpn.md; path = READMEs/README.jpn.md; sourceTree = "<group>"; };
 		EA2E2E7E2A1F7E500038A261 /* SettingReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingReducer.swift; sourceTree = "<group>"; };
 		EA2E2E812A1FA1050038A261 /* SearchReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchReducer.swift; sourceTree = "<group>"; };
+		EA5AA4B22EA9149E00BC2B5C /* VolumeButtonHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeButtonHandler.swift; sourceTree = "<group>"; };
 		EA5AA4A32EA9149E00BC2B5C /* AutoPlayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPlayHandler.swift; sourceTree = "<group>"; };
 		EA5AA4A42EA9149E00BC2B5C /* GestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureHandler.swift; sourceTree = "<group>"; };
 		EA5AA4A52EA9149E00BC2B5C /* LiveTextHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTextHandler.swift; sourceTree = "<group>"; };
@@ -711,6 +713,7 @@
 			isa = PBXGroup;
 			children = (
 				EA5AA4A32EA9149E00BC2B5C /* AutoPlayHandler.swift */,
+				EA5AA4B22EA9149E00BC2B5C /* VolumeButtonHandler.swift */,
 				EA5AA4A42EA9149E00BC2B5C /* GestureHandler.swift */,
 				EA5AA4A52EA9149E00BC2B5C /* LiveTextHandler.swift */,
 				EA5AA4A62EA9149E00BC2B5C /* PageHandler.swift */,
@@ -2000,6 +2003,7 @@
 				EA5AA4A82EA9149E00BC2B5C /* LiveTextHandler.swift in Sources */,
 				EA5AA4A92EA9149E00BC2B5C /* GestureHandler.swift in Sources */,
 				EA5AA4AA2EA9149E00BC2B5C /* AutoPlayHandler.swift in Sources */,
+				EA5AA4B12EA9149E00BC2B5C /* VolumeButtonHandler.swift in Sources */,
 				ABF45AE525F3313D00ECB568 /* PostCommentView.swift in Sources */,
 				AB358313269D7E89009466A5 /* DFRequest.swift in Sources */,
 				AB706F90278A5F680025A48A /* AppDelegateClient.swift in Sources */,

@@ -238,6 +238,7 @@
 "reading_setting_view.title.direction" = "方向";
 "reading_setting_view.title.preload_limit" = "プリロード上限数";
 "reading_setting_view.title.enables_landscape" = "横向きを有効";
+"reading_setting_view.title.enables_volume_key_paging" = "音量ボタンでページ送り";
 "reading_setting_view.title.separator_height" = "仕切りの高さ";
 "reading_setting_view.title.maximum_scale_factor" = "最大スケール係数";
 "reading_setting_view.title.double_tap_scale_factor" = "ダブルタップスケール係数";
