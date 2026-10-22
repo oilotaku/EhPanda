@@ -178,6 +178,9 @@ private struct WaterfallList: View {
                 } label: {
                     GalleryThumbnailCell(gallery: gallery, setting: setting, translateAction: translateAction)
                         .tint(.primary).multilineTextAlignment(.leading)
+                        // WaterfallGrid proposes its own (initially zero) height to every cell; without this
+                        // the scaled-to-fit cover shrinks, cells are measured too short and overlap.
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .buttonStyle(.borderless)
             }
