@@ -168,8 +168,10 @@ private struct WaterfallList: View {
         self.translateAction = translateAction
     }
 
+    // A ScrollView rather than a List: the whole grid is a single List row, so when it grows
+    // the List keeps the footer row anchored on screen and jumps to the bottom of the new page.
     var body: some View {
-        List {
+        ScrollView {
             WaterfallGrid(galleries) { gallery in
                 Button {
                     navigateAction?(gallery.id)
@@ -183,6 +185,7 @@ private struct WaterfallList: View {
                 columnsInPortrait: columnsInPortrait, columnsInLandscape: columnsInLandscape,
                 spacing: 15, animation: nil
             )
+            .padding([.horizontal, .top])
             if !shouldShowFooter {
                 Button {
                     fetchMoreAction?()
@@ -192,6 +195,8 @@ private struct WaterfallList: View {
                         Image(systemSymbol: .chevronDown)
                         Spacer()
                     }
+                    .frame(height: 50)
+                    .contentShape(Rectangle())
                 }
                 .foregroundStyle(.tint)
             } else {
@@ -201,6 +206,5 @@ private struct WaterfallList: View {
                 )
             }
         }
-        .listStyle(.plain)
     }
 }
