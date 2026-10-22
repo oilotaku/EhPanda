@@ -15,6 +15,7 @@ final class VolumeButtonHandler: ObservableObject {
     private static let resetSettleTime: TimeInterval = 0.15
 
     private var observation: NSKeyValueObservation?
+    private var lifecycleObservers: [NSObjectProtocol] = []
     private var volumeView: MPVolumeView?
     private var originalVolume: Float?
     private var ignoresChangesUntil = Date.distantPast
@@ -22,6 +23,7 @@ final class VolumeButtonHandler: ObservableObject {
 
     deinit {
         observation?.invalidate()
+        lifecycleObservers.forEach { NotificationCenter.default.removeObserver($0) }
         volumeView?.removeFromSuperview()
     }
 
@@ -52,9 +54,63 @@ final class VolumeButtonHandler: ObservableObject {
             }
         }
 
-        observation = session.observe(\.outputVolume, options: [.new]) { [weak self] _, change in
+        observeVolume()
+
+        // iOS deactivates the audio session while the app is in the background and KVO stops firing,
+        // so reactivate and re-observe when the app comes back.
+        let center = NotificationCenter.default
+        lifecycleObservers = [
+            center.addObserver(
+                forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
+            ) { [weak self] _ in self?.suspend() },
+            center.addObserver(
+                forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
+            ) { [weak self] _ in self?.resume() },
+            center.addObserver(
+                forName: AVAudioSession.interruptionNotification, object: session, queue: .main
+            ) { [weak self] notification in
+                let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
+                guard rawType.flatMap({ AVAudioSession.InterruptionType(rawValue: $0) }) == .ended else { return }
+                self?.resume()
+            }
+        ]
+    }
+
+    private func observeVolume() {
+        observation?.invalidate()
+        observation = AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.new]) { [weak self] _, change in
             guard let newValue = change.newValue else { return }
             DispatchQueue.main.async { self?.handleVolumeChange(newValue) }
+        }
+    }
+
+    /// Hands the volume back to the user while another app is in front.
+    private func suspend() {
+        guard observation != nil else { return }
+        Logger.info("suspend")
+        ignoresChangesUntil = .distantFuture
+        if let originalVolume, originalVolume != Self.baseVolume {
+            setVolume(originalVolume)
+        }
+    }
+
+    private func resume() {
+        guard observation != nil else { return }
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setActive(true)
+        } catch {
+            Logger.error("Failed to reactivate audio session", context: ["error": error])
+        }
+        observeVolume()
+        let current = session.outputVolume
+        Logger.info("resume", context: ["volume": current])
+        if abs(current - Self.baseVolume) > 0.001 {
+            // Whatever the volume is now was set deliberately elsewhere; restore that on stop.
+            originalVolume = current
+            resetVolume()
+        } else {
+            ignoresChangesUntil = Date()
         }
     }
 
@@ -63,6 +119,8 @@ final class VolumeButtonHandler: ObservableObject {
         Logger.info("stop")
         observation?.invalidate()
         observation = nil
+        lifecycleObservers.forEach { NotificationCenter.default.removeObserver($0) }
+        lifecycleObservers = []
         onPress = nil
         if let originalVolume, originalVolume != Self.baseVolume {
             setVolume(originalVolume)
